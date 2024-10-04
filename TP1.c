@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-int main()
+int main(int argc, char *argv[])
 {
     int choix;
     printf("Question : ");
@@ -29,7 +29,7 @@ int main()
         break;
     case 5:
         printf("\n");
-        question5();
+        question5(argc, argv);
         break;
     default:
         printf("J'ai pas ça.%d\n", choix);
@@ -123,10 +123,10 @@ void question3()
     }
 }
 
-
-void question4(){
+void question4()
+{
     printf("\n\nQuestion 4\n");
-    
+
     int fils = fork();
 
     if (fils < 0)
@@ -149,11 +149,11 @@ void question4(){
         printf("Le fils m'a retourné %d\n", status);
     }
 
-// Du coup ça affiche pas tout le bordel de ps (genre le tableau avec les processus)
+    // Du coup ça affiche pas tout le bordel de ps (genre le tableau avec les processus)
 }
 
-
-void question5(){
+void question5(int argc, char *argv[])
+{
     printf("\n\nQuestion 5\n");
 
     int fils = fork();
@@ -167,7 +167,9 @@ void question5(){
     else if (fils == 0)
     {
         printf("Processus fils\n");
-        execlp("ps", "ps", NULL);
+        execvp(argv[1], &argv[1]);
+        perror("execvp");
+        exit(EXIT_FAILURE);
     }
 
     else
