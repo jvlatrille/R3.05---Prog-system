@@ -3,7 +3,6 @@
 #include <unistd.h>
 
 void* boucle_infinie(void* arg) {
-    setbuf(stdout, NULL); // Désactive la bufferisation de stdout
     while (1) {
         printf(".\n");
         sleep(1); // Attend 1 seconde
@@ -13,7 +12,8 @@ void* boucle_infinie(void* arg) {
 
 void* attendre_entree(void* arg) {
     printf("Tapez un caractère : ");
-    getchar(); // Attend un caractère
+    getchar(); // Attend une entrée clavier
+
     return NULL;
 }
 
@@ -27,7 +27,7 @@ int main(){
     pthread_attr_init(&attr);
     
     //Question 4
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    // pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
     // ça ne fonctionne pas car le thread 1 est détaché et ne peut pas être joint
     
     // Crée le premier thread
@@ -36,7 +36,8 @@ int main(){
     pthread_create(&thread2, &attr, attendre_entree, NULL);
 
     printf("Les 2 threads sont lancés\n");
-    
+    pthread_attr_destroy(&attr); 
+
     // Question 2
     pthread_join(thread2, NULL);
 
