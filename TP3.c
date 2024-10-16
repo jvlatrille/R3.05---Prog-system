@@ -1,105 +1,77 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <time.h>
 
-/*
-// Question 1 : 
-// Non, à cause de l'accès concurrent non synchronisé à la variable
-// Les threads interfèrent entre eux lors de l'incrémentation de cpt, ce qui entraîne des pertes d'incréments.
-unsigned long cpt = 0;
-pthread_t thread1, thread2;
-
-void* compteur(){
-    int tmp;
-    int i;
-    for (i = 0; i < 10000000; i++) {
-        tmp = cpt;
-        tmp++;
-        cpt = tmp;
-    }
-    printf("cpt = %lu\n", cpt);
-}
-
-int main() {
-
-    pthread_create(&thread1, NULL, compteur, NULL);
-    pthread_create(&thread2, NULL, compteur, NULL);
-
-    pthread_join(thread1, NULL);
-    pthread_join(thread2, NULL);
-
-    printf("valeur finale du compteur = %lu\n", cpt);
-
-    return 0;
-}
-*/
-
-
-
-/*
-// Question 2 : 
-// Ui, ça donne 20 millions
-
-unsigned long cpt = 0;
+unsigned long cptQ1 = 0;
+unsigned long cptQ2 = 0;
 pthread_t thread1, thread2;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-void* compteur(){
+void* compteurQ1() {
+    int tmp;
+    int i;
+    for (i = 0; i < 10000000; i++) {
+        tmp = cptQ1;
+        tmp++;
+        cptQ1 = tmp;
+    }
+    printf("cptQ1 = %lu\n", cptQ1);
+    return NULL;
+}
+
+
+void* compteurQ2() {
     int tmp;
     int i;
     for (i = 0; i < 10000000; i++) {
         pthread_mutex_lock(&mutex);
-        tmp = cpt;
+        tmp = cptQ2;
         tmp++;
-        cpt = tmp;
+        cptQ2 = tmp;
         pthread_mutex_unlock(&mutex);
     }
-    printf("cpt = %lu\n", cpt);
+    printf("cptQ2 = %lu\n", cptQ2);
+    return NULL;
 }
 
 int main() {
+    struct timespec start, end;
+    double elapsed;
 
-    pthread_create(&thread1, NULL, compteur, NULL);
-    pthread_create(&thread2, NULL, compteur, NULL);
+    // Question 1
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    pthread_create(&thread1, NULL, compteurQ1, NULL);
+    pthread_create(&thread2, NULL, compteurQ1, NULL);
 
     pthread_join(thread1, NULL);
     pthread_join(thread2, NULL);
 
-    printf("valeur finale du compteur = %lu\n", cpt);
+    clock_gettime(CLOCK_MONOTONIC, &end);
 
-    return 0;
-}
-*/
+    elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
 
-/**/
-// Question 3 :
+    printf("Valeur finale du compteur Q1 = %lu\n", cptQ1);
+    printf("Temps écoulé pour Q1: %.9f secondes\n", elapsed);
 
-unsigned long cpt = 0;
-pthread_t thread1, thread2;
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    // Question 2
+    cptQ2 = 0;
 
-void* compteur(){
-    int tmp;
-    int i;
-    for (i = 0; i < 10000000; i++) {
-        pthread_mutex_lock(&mutex);
-        tmp = cpt;
-        tmp++;
-        cpt = tmp;
-        pthread_mutex_unlock(&mutex);
-    }
-    printf("cpt = %lu\n", cpt);
-}
+    clock_gettime(CLOCK_MONOTONIC, &start);
 
-int main() {
-
-    pthread_create(&thread1, NULL, compteur, NULL);
-    pthread_create(&thread2, NULL, compteur, NULL);
+    pthread_create(&thread1, NULL, compteurQ2, NULL);
+    pthread_create(&thread2, NULL, compteurQ2, NULL);
 
     pthread_join(thread1, NULL);
     pthread_join(thread2, NULL);
 
-    printf("valeur finale du compteur = %lu\n", cpt);
+    clock_gettime(CLOCK_MONOTONIC, &end);
+
+    elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+
+    printf("Valeur finale du compteur Q2 = %lu\n", cptQ2);
+    printf("Temps écoulé pour Q2: %.9f secondes\n", elapsed);
 
     return 0;
 }
