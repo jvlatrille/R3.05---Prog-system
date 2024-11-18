@@ -204,3 +204,100 @@ int main() {
     free(arr);  // Libération de la mémoire
     return 0;
 }
+
+
+
+
+//Question 3 corrigée : 
+DEFINE TAILLE 1000000
+
+struct sigaction pere_trouve;
+
+void trouve(int sig){
+    exit(EXIT_SUCCESS);
+}
+
+int main(){
+    int tableau[TAILLE];
+    pid_t id;
+    id = fork();
+    
+    switch (id)
+    {
+    case -1:
+        printf("Erreur lors de la création du processus\n");
+        exit(EXIT_FAILURE);
+        break;
+    case 0:
+        pere_trouve.sa_handler = trouve;
+        pere_trouve.sa_flags = SA_RESTART;
+        sig_emptyset(&pere_trouve.sa_mask);
+        sigaction(SIGUSR1, pere_trouve, NULL);
+        break;
+    default:
+        kill(id, SIGUSR1);
+        wait(&etat);
+        exit(EXIT_SUCCESS);
+        break;
+    }
+}
+
+
+// Question 4 correction :
+
+DEFINE TAILLE 1000000
+int arreter = 0;
+
+struct sigaction pere_trouve, fils_trouve;
+
+void ptrouve(int sig){
+    exit(EXIT_FAILURE);
+}
+
+void ftrouve(int sig){
+    wait(&etat);
+    if(WEXIT_STATUS(etat) == EXIT_SUCCESS){
+        exit(EXIT_SUCCESS);
+        printf("L'élément a été trouvé\n");
+        arreter = 1;
+    }
+    else{
+        exit(EXIT_FAILURE);
+    }
+}
+
+int main(){
+    int tableau[TAILLE];
+    pid_t id;
+    id = fork();
+    
+    switch (id)
+    {
+    case -1:
+        printf("Erreur lors de la création du processus\n");
+        exit(EXIT_FAILURE);
+        break;
+    case 0:
+        pere_trouve.sa_handler = trouve;
+        pere_trouve.sa_flags = SA_RESTART;
+        sig_emptyset(&pere_trouve.sa_mask);
+        sigaction(SIGUSR1, pere_trouve, NULL);
+        break;
+    default:
+        fils_trouve.sa_handler = arret;
+        fils_trouve.sa_flags = SA_RESTART;
+        sig_emptyset(&fils_trouve.sa_mask);
+        sigaction(SIGUSR1, fils_trouve, NULL);
+        while ((j<TAILLE) && (tableau[j] != valeur) && (arreter == 0))
+        {
+            j++;
+        }
+        
+        if((j<TAILLE/2) && (arreter==0){
+            kill(id, SIGUSR1);
+        }
+        wait(&etat);
+        exit(EXIT_SUCCESS);
+        break;
+    }
+}
